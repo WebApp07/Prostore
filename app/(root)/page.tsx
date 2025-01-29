@@ -1,10 +1,14 @@
-import { Button } from "@/components/ui/button";
-import React from "react";
+import ProductList from "@/components/shared/product/product-list";
+import sampleData from "@/db/sample-data";
 
 const Home = () => {
   return (
     <div>
-      <Button>click me</Button>
+      <ProductList
+        data={sampleData.products}
+        title="Newest Arrivals"
+        limit={4}
+      />
     </div>
   );
 };
