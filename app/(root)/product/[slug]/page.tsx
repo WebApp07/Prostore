@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import NotFoundPage from "@/app/not-found";
 import { getLatestProductBySlug } from "@/lib/actions/product.actions";
@@ -59,11 +58,6 @@ const ProductDetailsPage = async (props: {
                 </div>
                 <div className="mb-2 flex justify-between">
                   <div>Status</div>
-                  {product?.stock > 0 ? (
-                    <Badge variant="outline">In Stock</Badge>
-                  ) : (
-                    <Badge variant="destructive">Out Of Stock</Badge>
-                  )}
                 </div>
                 {(product?.stock ?? 0) > 0 ? (
                   <Badge variant="outline">In Stock</Badge>
