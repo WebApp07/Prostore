@@ -22,7 +22,7 @@ const ProductDetailsPage = async (props: {
           {/*Images Column */}
           <div className="col-span-2">
             {/*Images Component */}
-            <ProductImages images={product?.images} />
+            <ProductImages images={product?.images || []} />
           </div>
           {/*Details Column */}
           <div className="col-span-2 p-5">
