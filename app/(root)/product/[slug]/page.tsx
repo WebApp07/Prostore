@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import NotFoundPage from "@/app/not-found";
 import { getLatestProductBySlug } from "@/lib/actions/product.actions";
 import ProductPrice from "@/components/shared/product/product-price";
+import ProductImages from "@/components/shared/product/product-images";
 
 const ProductDetailsPage = async (props: {
   params: Promise<{ slug: string }>;
@@ -17,14 +18,17 @@ const ProductDetailsPage = async (props: {
   return (
     <>
       <section>
-        <div className="grid gird-col-1 md:grid-cols-5">
+        <div className="grid gird-cols-1 md:grid-cols-5">
           {/*Images Column */}
-          <div className="col-span-2">{/*Images Component */}</div>
+          <div className="col-span-2">
+            {/*Images Component */}
+            <ProductImages images={product?.images} />
+          </div>
+          {/*Details Column */}
           <div className="col-span-2 p-5">
-            {/*Details Column */}
             <div className="flex flex-col gap-6">
               <p>
-                {product?.brand} {product?.category}{" "}
+                {product?.brand} {product?.category}
               </p>
               <h1 className="h3-bold">{product?.name}</h1>
               <p>
@@ -46,9 +50,9 @@ const ProductDetailsPage = async (props: {
           {/*Action Column */}
           <div>
             <Card>
-              <CardContent>
-                <div className="p-4">
-                  <div className="mb-2 flex justify-between">Price</div>
+              <CardContent className="p-4">
+                <div className="mb-2 flex justify-between">
+                  <div>Price</div>
                   <div>
                     <ProductPrice value={Number(product?.price)} />
                   </div>
