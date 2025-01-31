@@ -35,7 +35,7 @@ const SignUpForm = () => {
 
       <div className="space-y-6">
         <div>
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="name">Enter your Name</Label>
           <Input
             id="name"
             name="name"
