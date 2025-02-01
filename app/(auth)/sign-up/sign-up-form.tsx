@@ -35,12 +35,11 @@ const SignUpForm = () => {
 
       <div className="space-y-6">
         <div>
-          <Label htmlFor="name">Enter your Name</Label>
+          <Label htmlFor="name">Name</Label>
           <Input
             id="name"
             name="name"
             type="text"
-            required
             autoComplete="name"
             defaultValue={signUpDefaultValues.email}
           />
@@ -50,8 +49,7 @@ const SignUpForm = () => {
           <Input
             id="email"
             name="email"
-            type="email"
-            required
+            type="text"
             autoComplete="email"
             defaultValue={signUpDefaultValues.email}
           />
