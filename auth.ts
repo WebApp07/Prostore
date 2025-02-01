@@ -22,7 +22,7 @@ export const config = {
         password: { type: "password" },
       },
       async authorize(credentials) {
-        if (credentials == null) return null;
+        if (!credentials) return null;
 
         // Find user in database
         const user = await prisma.user.findFirst({
@@ -31,39 +31,50 @@ export const config = {
           },
         });
 
-        // Check if user exists and if the password matches
         if (user && user.password) {
           const isMatch = await compare(
             credentials.password as string,
             user.password
           );
 
-          // If password is correct, return user
           if (isMatch) {
             return {
               id: user.id,
-              name: user.name,
+              name: user.name ?? user.email.split("@")[0], // Ensure name is never undefined
               email: user.email,
               role: user.role,
             };
           }
         }
-        // If user does not exist or password does not match return null
+
         return null;
       },
     }),
   ],
   callbacks: {
-    async session({ session, user, trigger, token }: any) {
-      // Set the user ID from the token
+    async session({ session, token }: any) {
       session.user.id = token.sub;
+      session.user.role = token.role;
+      session.user.name = token.name; // Use token.name instead of user.name
 
-      // If there is an update, set the user name
-      if (trigger === "update") {
-        session.user.name = user.name;
-      }
+      console.log(token);
 
       return session;
+    },
+
+    async jwt({ token, user }: any) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+        token.name = user.name ?? user.email.split("@")[0]; // Ensure name is set
+
+        // Update database if name was missing
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { name: token.name },
+        });
+      }
+      return token;
     },
   },
 } satisfies NextAuthConfig;
