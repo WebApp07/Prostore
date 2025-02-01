@@ -4,6 +4,7 @@ import NotFoundPage from "@/app/not-found";
 import { getLatestProductBySlug } from "@/lib/actions/product.actions";
 import ProductPrice from "@/components/shared/product/product-price";
 import ProductImages from "@/components/shared/product/product-images";
+import AddToCart from "@/components/shared/product/add-to-cart";
 
 const ProductDetailsPage = async (props: {
   params: Promise<{ slug: string }>;
@@ -63,6 +64,21 @@ const ProductDetailsPage = async (props: {
                   <Badge variant="outline">In Stock</Badge>
                 ) : (
                   <Badge variant="destructive">Out Of Stock</Badge>
+                )}
+
+                {product?.stock > 0 && (
+                  <div className="flex-center">
+                    <AddToCart
+                      item={{
+                        productId: product?.id,
+                        name: product?.name,
+                        slug: product?.slug,
+                        price: product?.price,
+                        qty: 1,
+                        image: product?.images![0],
+                      }}
+                    />
+                  </div>
                 )}
               </CardContent>
             </Card>
