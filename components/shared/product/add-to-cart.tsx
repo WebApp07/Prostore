@@ -3,8 +3,7 @@
 import { CartItem } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { PlaneIcon, Plus } from "lucide-react";
-import { CartItem } from "@/types";
+import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { addItemToCart } from "@/lib/actions/cart.actions";
