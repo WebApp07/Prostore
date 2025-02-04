@@ -18,17 +18,17 @@ const AddToCart = ({ cart, item }: { cart?: Cart; item: CartItem }) => {
     startTransition(async () => {
       const res = await addItemToCart(item);
 
-      if (!res.success) {
+      if (!res?.success) {
         toast({
           variant: "destructive",
-          description: res.message,
+          description: res?.message,
         });
         return;
       }
 
       // Handle success add to cart
       toast({
-        description: res.message,
+        description: res?.message,
         action: (
           <ToastAction
             className="bg-primary text-white hover:bg-gray-800"
