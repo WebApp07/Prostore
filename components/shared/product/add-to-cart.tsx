@@ -14,10 +14,10 @@ const AddToCart = ({ item }: { item: CartItem }) => {
   const handleAddToCart = async () => {
     const res = await addItemToCart(item);
 
-    if (!res.success) {
+    if (!res?.success) {
       toast({
         variant: "destructive",
-        description: res.message,
+        description: res?.message,
       });
       return;
     }
@@ -25,7 +25,7 @@ const AddToCart = ({ item }: { item: CartItem }) => {
     // Handle success add to cart
 
     toast({
-      description: `${item.name} added to cart`,
+      description: res?.message,
       action: (
         <ToastAction
           className="bg-primary text-white hover:bg-gray-800"
