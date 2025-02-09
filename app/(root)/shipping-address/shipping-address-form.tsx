@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Loader } from "lucide-react";
-//import { updateUserAddress } from "@/lib/actions/user.actions";
+import { updateUserAddress } from "@/lib/actions/user.actions";
 import { shippingAddressDefaultValues } from "@/lib/constants";
 
 const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
@@ -37,7 +37,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
     values
   ) => {
     startTransition(async () => {
-      //const res = await updateUserAddress(values);
+      const res = await updateUserAddress(values);
 
       if (!res.success) {
         toast({
