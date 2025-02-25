@@ -23,6 +23,7 @@ const SignUpPage = async (props: {
   }>;
 }) => {
   const { callbackUrl } = await props.searchParams;
+
   const session = await auth();
 
   if (session) {
@@ -39,11 +40,12 @@ const SignUpPage = async (props: {
               width={100}
               height={100}
               alt={`${APP_NAME} logo`}
+              priority={true}
             />
           </Link>
           <CardTitle className="text-center">Create Account</CardTitle>
           <CardDescription className="text-center">
-            Enter your infromation below to sign up
+            Enter your information below to sign up
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

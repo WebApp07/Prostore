@@ -24,7 +24,9 @@ export const config = {
         password: { type: "password" },
       },
       async authorize(credentials) {
-        if (credentials == null) return null;
+        if (credentials == null) {
+          throw new Error("Missing Credentials");
+        }
 
         // Find user in database
         const user = await prisma.user.findFirst({

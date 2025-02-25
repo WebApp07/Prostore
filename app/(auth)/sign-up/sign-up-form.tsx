@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signUpUser } from "@/lib/actions/user.actions";
 import { signUpDefaultValues } from "@/lib/constants";
 import Link from "next/link";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { signUpUser } from "@/lib/actions/user.actions";
 import { useSearchParams } from "next/navigation";
 
 const SignUpForm = () => {
@@ -32,16 +32,15 @@ const SignUpForm = () => {
   return (
     <form action={action}>
       <input type="hidden" name="callbackUrl" value={callbackUrl} />
-
       <div className="space-y-6">
         <div>
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="email">Name</Label>
           <Input
             id="name"
             name="name"
             type="text"
             autoComplete="name"
-            defaultValue={signUpDefaultValues.email}
+            defaultValue={signUpDefaultValues.name}
           />
         </div>
         <div>
