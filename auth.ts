@@ -23,6 +23,7 @@ export const config = {
         email: { type: "email" },
         password: { type: "password" },
       },
+
       async authorize(credentials) {
         if (credentials == null) {
           throw new Error("Missing Credentials");
