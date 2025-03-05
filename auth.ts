@@ -2,10 +2,10 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compare } from "./lib/encrypt";
 import type { NextAuthConfig } from "next-auth";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { compareSync } from "bcrypt-ts-edge";
 
 export const config = {
   pages: {
@@ -26,7 +26,7 @@ export const config = {
 
       async authorize(credentials) {
         if (credentials == null) {
-          throw new Error("Missing Credentials");
+          return null;
         }
 
         // Find user in database
@@ -38,7 +38,7 @@ export const config = {
 
         // Check if user exists and if the password matches
         if (user && user.password) {
-          const isMatch = await compare(
+          const isMatch = compareSync(
             credentials.password as string,
             user.password
           );
