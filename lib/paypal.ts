@@ -1,7 +1,7 @@
 const base = process.env.PAYPAL_API_URL || "https://api-m.sandbox.paypal.com";
 
 export const paypal = {
-  CreateOrder: async function CreateOrder(price: number) {
+  createOrder: async function createOrder(price: number) {
     const accessToken = await generateAccessToken();
     const url = `${base}/v2/checkout/orders`;
 
@@ -13,14 +13,17 @@ export const paypal = {
       },
       body: JSON.stringify({
         intent: "CAPTURE",
-        purchase_units: {
-          amount: {
-            Currency_code: "USD",
-            value: price,
+        purchase_units: [
+          {
+            amount: {
+              currency_code: "USD",
+              value: price,
+            },
           },
-        },
+        ],
       }),
     });
+
     return handleResponse(response);
   },
   capturePayment: async function capturePayment(orderId: string) {
