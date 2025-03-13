@@ -28,12 +28,12 @@ export const paypal = {
   },
   capturePayment: async function capturePayment(orderId: string) {
     const accessToken = await generateAccessToken();
-    const url = `${base}/v2.checkout/orders/${orderId}/capture`;
+    const url = `${base}/v2/checkout/orders/${orderId}/capture`;
 
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        "Content-Type": "applcation/json",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
     });
@@ -63,7 +63,7 @@ async function generateAccessToken() {
 
 async function handleResponse(response: Response) {
   if (response.ok) {
-    return await response.json();
+    return response.json();
   } else {
     const errorMessage = await response.text();
     throw new Error(errorMessage);
