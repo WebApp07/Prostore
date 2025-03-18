@@ -11,6 +11,7 @@ import { CartItem, PaymentResult } from "@/types";
 import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
+import { Prisma } from "@prisma/client";
 
 // Create order and create the order items
 
@@ -266,27 +267,67 @@ async function updateOrderToPaid({
 
 // Get user's order
 
-export async function getMyOrders({
+export async function getOrderSummary() {
+  // Get counts for each resource
+  const ordersCount = await prisma.order.count();
+  const productsCount = await prisma.product.count();
+  const usersCount = await prisma.user.count();
+
+  // Calculate the total sales
+  const totalSales = await prisma.order.aggregate({
+    _sum: { totalPrice: true },
+  });
+
+  // Get monthly sales
+  const salesDataRaw = await prisma.$queryRaw<
+    Array<{ month: string; totalSales: Prisma.Decimal }>
+  >`SELECT to_char("createdAt", 'MM/YY') as "month", sum("totalPrice") as "totalSales" FROM "Order" GROUP BY to_char("createdAt", 'MM/YY')`;
+
+  const salesData: SalesDataType = salesDataRaw.map((entry) => ({
+    month: entry.month,
+    totalSales: Number(entry.totalSales),
+  }));
+
+  // Get latest sales
+  const latestSales = await prisma.order.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      user: { select: { name: true } },
+    },
+    take: 6,
+  });
+
+  return {
+    ordersCount,
+    productsCount,
+    usersCount,
+    totalSales,
+    latestSales,
+    salesData,
+  };
+}
+
+// Get all orders
+
+export async function getAllOrders({
   limit = PAGE_SIZE,
   page,
 }: {
   limit?: number;
   page: number;
 }) {
-  const session = await auth();
-  if (!session) throw new Error("User is not authorized.");
   const data = await prisma.order.findMany({
-    where: { userId: session?.user?.id }, // userId is guaranteed to exist here
-    skip: (page - 1) * limit, // Pagination offset
-    take: limit, // Number of records per page
-    orderBy: { createdAt: "desc" }, // Optional: Sort by creation time
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    skip: (page - 1) * limit,
+    include: {
+      user: {
+        select: { name: true },
+      },
+    },
   });
+  const dataCount = await prisma.order.count();
 
-  //return data; // Return the results
-
-  const dataCount = await prisma.order.count({
-    where: { userId: session?.user?.id },
-  });
   return {
     data,
     totalPages: Math.ceil(dataCount / limit),
