@@ -351,7 +351,7 @@ export async function deleteOrder(id: string) {
 
 // Update COD order to paid
 
-export async function updateOrderToPaidPayPal(orderId: string) {
+export async function updateOrderToPaidCOD(orderId: string) {
   try {
     await updateOrderToPaid({ orderId });
     revalidatePath(`/order/${orderId}`);

@@ -27,18 +27,15 @@ import {
   updateOrderToPaidCOD,
   deliverOrder,
 } from "@/lib/actions/order.actions";
-import StripePayment from "./stripe-payment";
 
 const OrderDetailsTable = ({
   order,
   paypalClientId,
   isAdmin,
-  stripeClientSecret,
 }: {
   order: Omit<Order, "paymentResult">;
   paypalClientId: string;
   isAdmin: boolean;
-  stripeClientSecret: string | null;
 }) => {
   const {
     id,
@@ -247,6 +244,11 @@ const OrderDetailsTable = ({
                   </PayPalScriptProvider>
                 </div>
               )}
+              {isAdmin && !isPaid && paymentMethod === "PayPal" && (
+                <MarkAsPaidButton />
+              )}
+
+              {isAdmin && isPaid && !isDelivered && <MarkAsDeliveredButton />}
             </CardContent>
           </Card>
         </div>
