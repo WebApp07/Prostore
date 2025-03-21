@@ -17,10 +17,18 @@ export async function getLatestProducts() {
 }
 
 // Get single product by it's slug
-export async function getLatestProductBySlug(slug: string) {
+export async function getProductBySlug(slug: string) {
   return await prisma.product.findFirst({
     where: { slug: slug },
   });
+}
+
+// Get single product by  it's ID
+export async function getProductById(productId: string) {
+  const data = await prisma.product.findFirst({
+    where: { id: productId },
+  });
+  return convertToPlainObject(data);
 }
 
 // Get all products
@@ -95,14 +103,15 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
       where: { id: product.id },
     });
 
-    if (!productExists) throw new Error("Produt not found.");
+    if (!productExists) throw new Error("Product not found");
 
     await prisma.product.update({
       where: { id: product.id },
       data: product,
     });
 
-    revalidatePath("/admin/produts");
+    revalidatePath("/admin/products");
+
     return {
       success: true,
       message: "Product updated successfully",
