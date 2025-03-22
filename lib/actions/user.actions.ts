@@ -5,6 +5,7 @@ import {
   paymentMethodSchema,
   shippingAddressSchema,
   signInFormSchema,
+  updateUserSchema,
 } from "../validators";
 import { auth, signIn, signOut } from "@/auth";
 import { hashSync } from "bcrypt-ts-edge";
