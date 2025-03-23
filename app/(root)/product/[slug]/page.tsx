@@ -16,8 +16,8 @@ const ProductDetailsPage = async (props: {
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const session = await auth();
-  const userId = session?.user?.id;
+  //const session = await auth();
+  //const userId = session?.user?.id;
 
   const cart = await getMyCart();
 
