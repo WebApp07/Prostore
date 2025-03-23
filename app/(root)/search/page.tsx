@@ -1,8 +1,8 @@
 import ProductCard from "@/components/shared/product/product-card";
 import { Button } from "@/components/ui/button";
 import {
-  getAllCategories,
   getAllProducts,
+  getAllCategories,
 } from "@/lib/actions/product.actions";
 import Link from "next/link";
 
@@ -30,7 +30,44 @@ const prices = [
 ];
 
 const ratings = [4, 3, 2, 1];
+
 const sortOrders = ["newest", "lowest", "highest", "rating"];
+
+export async function generateMetadata(props: {
+  searchParams: Promise<{
+    q: string;
+    category: string;
+    price: string;
+    rating: string;
+  }>;
+}) {
+  const {
+    q = "all",
+    category = "all",
+    price = "all",
+    rating = "all",
+  } = await props.searchParams;
+
+  const isQuerySet = q && q !== "all" && q.trim() !== "";
+  const isCategorySet =
+    category && category !== "all" && category.trim() !== "";
+  const isPriceSet = price && price !== "all" && price.trim() !== "";
+  const isRatingSet = rating && rating !== "all" && rating.trim() !== "";
+
+  if (isQuerySet || isCategorySet || isPriceSet || isRatingSet) {
+    return {
+      title: `
+      Search ${isQuerySet ? q : ""} 
+      ${isCategorySet ? `: Category ${category}` : ""}
+      ${isPriceSet ? `: Price ${price}` : ""}
+      ${isRatingSet ? `: Rating ${rating}` : ""}`,
+    };
+  } else {
+    return {
+      title: "Search Products",
+    };
+  }
+}
 
 const SearchPage = async (props: {
   searchParams: Promise<{
@@ -54,26 +91,26 @@ const SearchPage = async (props: {
   // Construct filter url
   const getFilterUrl = ({
     c,
-    s,
     p,
+    s,
     r,
     pg,
   }: {
     c?: string;
-    s?: string;
     p?: string;
+    s?: string;
     r?: string;
     pg?: string;
   }) => {
     const params = { q, category, price, rating, sort, page };
 
     if (c) params.category = c;
+    if (p) params.price = p;
     if (s) params.sort = s;
-    if (p) params.price = price;
     if (r) params.rating = r;
     if (pg) params.page = pg;
 
-    return `/search?/${new URLSearchParams(params).toString()}`;
+    return `/search?${new URLSearchParams(params).toString()}`;
   };
 
   const products = await getAllProducts({
@@ -91,14 +128,14 @@ const SearchPage = async (props: {
     <div className="grid md:grid-cols-5 md:gap-5">
       <div className="filter-links">
         {/* Category Links */}
-        <div className="text-xl mb-2 ml-3">Department</div>
+        <div className="text-xl mb-2 mt-3">Department</div>
         <div>
           <ul className="space-y-1">
             <li>
               <Link
                 className={`${
-                  category === "all" || category === ""
-                } && "font-bold"`}
+                  (category === "all" || category === "") && "font-bold"
+                }`}
                 href={getFilterUrl({ c: "all" })}
               >
                 Any
@@ -118,12 +155,11 @@ const SearchPage = async (props: {
         </div>
         {/* Price Links */}
         <div className="text-xl mb-2 mt-8">Price</div>
-
         <div>
           <ul className="space-y-1">
             <li>
               <Link
-                className={`${price === "all"} && "font-bold"`}
+                className={`${price === "all" && "font-bold"}`}
                 href={getFilterUrl({ p: "all" })}
               >
                 Any
@@ -143,12 +179,11 @@ const SearchPage = async (props: {
         </div>
         {/* Rating Links */}
         <div className="text-xl mb-2 mt-8">Customer Ratings</div>
-
         <div>
           <ul className="space-y-1">
             <li>
               <Link
-                className={`${rating === "all"} && "font-bold"`}
+                className={`${rating === "all" && "font-bold"}`}
                 href={getFilterUrl({ r: "all" })}
               >
                 Any
@@ -167,7 +202,6 @@ const SearchPage = async (props: {
           </ul>
         </div>
       </div>
-
       <div className="md:col-span-4 space-y-4">
         <div className="flex-between flex-col md:flex-row my-4">
           <div className="flex items-center">
@@ -198,7 +232,6 @@ const SearchPage = async (props: {
             ))}
           </div>
         </div>
-
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {products.data.length === 0 && <div>No products found</div>}
           {products.data.map((product) => (
