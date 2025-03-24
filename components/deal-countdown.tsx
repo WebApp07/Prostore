@@ -87,8 +87,8 @@ const DealCountdown = () => {
       <div className="flex flex-col gap-2 justify-center">
         <h3 className="text-3xl font-bold">Deal Of The Week</h3>
         <p>
-          Don't miss out on this week's exclusive deals! Shop now and enjoy
-          amazing discounts available for a limited time. 🛒🎁
+          Don&apos;t miss out on this week&apos;s exclusive deals! Shop now and
+          enjoy amazing discounts available for a limited time. Lifetime 🛒🎁
         </p>
         <ul className="grid grid-cols-4">
           <StatBox label="Days" value={time.days} />
