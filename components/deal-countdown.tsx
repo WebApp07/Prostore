@@ -88,7 +88,8 @@ const DealCountdown = () => {
         <h3 className="text-3xl font-bold">Deal Of The Week</h3>
         <p>
           Don&apos;t miss out on this week&apos;s exclusive deals! Shop now and
-          enjoy amazing discounts available for a limited time. Lifetime 🛒🎁
+          enjoy amazing discounts available for a limited time. Lifetime
+          Subscription 🛒🎁
         </p>
         <ul className="grid grid-cols-4">
           <StatBox label="Days" value={time.days} />
