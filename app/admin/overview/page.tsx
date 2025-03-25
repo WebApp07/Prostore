@@ -1,5 +1,3 @@
-import { auth } from "@/auth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -8,26 +6,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getOrderSummary } from "@/lib/actions/user.actions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getOrderSummary } from "@/lib/actions/order.actions";
 import { formatCurrency, formatDateTime, formatNumber } from "@/lib/utils";
 import { BadgeDollarSign, Barcode, CreditCard, Users } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 import Charts from "./charts";
+import { requireAdmin } from "@/lib/auth-guard";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",
 };
 
 const AdminOverviewPage = async () => {
-  const session = await auth();
-
-  if (session?.user?.role !== "admin") {
-    throw new Error("User is not authorized");
-  }
+  await requireAdmin();
 
   const summary = await getOrderSummary();
-  console.log(summary);
 
   return (
     <div className="space-y-2">
@@ -46,7 +41,6 @@ const AdminOverviewPage = async () => {
             </div>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Sales</CardTitle>
@@ -118,9 +112,11 @@ const AdminOverviewPage = async () => {
                       {formatDateTime(order.createdAt).dateOnly}
                     </TableCell>
                     <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
-                    <Link href={`/order/${order.id}`}>
-                      <span className="px-2">Details</span>
-                    </Link>
+                    <TableCell>
+                      <Link href={`/order/${order.id}`}>
+                        <span className="px-2">Details</span>
+                      </Link>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

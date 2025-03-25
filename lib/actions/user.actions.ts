@@ -1,21 +1,23 @@
 "use server";
 
-import { isRedirectError } from "next/dist/client/components/redirect-error";
 import {
-  paymentMethodSchema,
   shippingAddressSchema,
   signInFormSchema,
+  signUpFormSchema,
+  paymentMethodSchema,
   updateUserSchema,
 } from "../validators";
 import { auth, signIn, signOut } from "@/auth";
-import { hashSync } from "bcrypt-ts-edge";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { hash } from "../encrypt";
 import { prisma } from "@/db/prisma";
 import { formatError } from "../utils";
 import { ShippingAddress } from "@/types";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
 import { PAGE_SIZE } from "../constants";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
+import { getMyCart } from "./cart.actions";
 
 // Sign in the user with credentials
 export async function signInWithCredentials(
@@ -30,33 +32,41 @@ export async function signInWithCredentials(
 
     await signIn("credentials", user);
 
-    return { success: true, message: "Signed in successfully." };
+    return { success: true, message: "Signed in successfully" };
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
     }
-    return { success: false, message: "Invalid email or password." };
+    return { success: false, message: "Invalid email or password" };
   }
 }
 
 // Sign user out
 export async function signOutUser() {
+  // get current users cart and delete it so it does not persist to next user
+  const currentCart = await getMyCart();
+
+  if (currentCart?.id) {
+    await prisma.cart.delete({ where: { id: currentCart.id } });
+  } else {
+    console.warn("No cart found for deletion.");
+  }
   await signOut();
 }
 
 // Sign up user
-
 export async function signUpUser(prevState: unknown, formData: FormData) {
   try {
-    const user = signInFormSchema.parse({
+    const user = signUpFormSchema.parse({
       name: formData.get("name"),
       email: formData.get("email"),
       password: formData.get("password"),
       confirmPassword: formData.get("confirmPassword"),
     });
+
     const plainPassword = user.password;
 
-    user.password = hashSync(user.password, 10);
+    user.password = await hash(user.password);
 
     await prisma.user.create({
       data: {
@@ -70,7 +80,8 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       email: user.email,
       password: plainPassword,
     });
-    return { success: true, message: "User registered successfully." };
+
+    return { success: true, message: "User registered successfully" };
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
@@ -116,17 +127,16 @@ export async function updateUserAddress(data: ShippingAddress) {
 }
 
 // Update user's payment method
-
 export async function updateUserPaymentMethod(
   data: z.infer<typeof paymentMethodSchema>
 ) {
   try {
     const session = await auth();
     const currentUser = await prisma.user.findFirst({
-      where: { id: session?.user.id },
+      where: { id: session?.user?.id },
     });
 
-    if (!currentUser) throw new Error("User not found.");
+    if (!currentUser) throw new Error("User not found");
 
     const paymentMethod = paymentMethodSchema.parse(data);
 
@@ -137,7 +147,7 @@ export async function updateUserPaymentMethod(
 
     return {
       success: true,
-      message: "User Updated successfully",
+      message: "User updated successfully",
     };
   } catch (error) {
     return { success: false, message: formatError(error) };
@@ -148,14 +158,15 @@ export async function updateUserPaymentMethod(
 export async function updateProfile(user: { name: string; email: string }) {
   try {
     const session = await auth();
+
     const currentUser = await prisma.user.findFirst({
       where: {
         id: session?.user?.id,
       },
     });
-    if (!currentUser) {
-      throw new Error("User not found.");
-    }
+
+    if (!currentUser) throw new Error("User not found");
+
     await prisma.user.update({
       where: {
         id: currentUser.id,
@@ -167,56 +178,14 @@ export async function updateProfile(user: { name: string; email: string }) {
 
     return {
       success: true,
-      message: "User Updated successfully",
+      message: "User updated successfully",
     };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
 }
 
-// Get sales data and order summary
-export async function getOrderSummary() {
-  // Get counts for each resource
-  const ordersCount = await prisma.order.count();
-  const productsCount = await prisma.product.count();
-  const usersCount = await prisma.user.count();
-
-  // Calculate the total sales
-  const totalSales = await prisma.order.aggregate({
-    _sum: { totalPrice: true },
-  });
-
-  // Get monthly sales
-  const salesDataRaw = await prisma.$queryRaw<
-    Array<{ month: string; totalSales: Prisma.Decimal }>
-  >`SELECT to_char("createdAt", 'MM/YY') as "month", sum("totalPrice") as "totalSales" FROM "Order" GROUP BY to_char("createdAt", 'MM/YY')`;
-
-  const salesData: SalesDataType = salesDataRaw.map((entry) => ({
-    month: entry.month,
-    totalSales: Number(entry.totalSales),
-  }));
-
-  // Get latest sales
-  const latestSales = await prisma.order.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      user: { select: { name: true } },
-    },
-    take: 6,
-  });
-
-  return {
-    ordersCount,
-    productsCount,
-    usersCount,
-    totalSales,
-    latestSales,
-    salesData,
-  };
-}
-
-// Get all users
-
+// Get all the users
 export async function getAllUsers({
   limit = PAGE_SIZE,
   page,
@@ -253,14 +222,16 @@ export async function getAllUsers({
   };
 }
 
-// Delete user
+// Delete a user
 export async function deleteUser(id: string) {
   try {
     await prisma.user.delete({ where: { id } });
+
     revalidatePath("/admin/users");
+
     return {
       success: true,
-      message: "User deleted successful",
+      message: "User deleted successfully",
     };
   } catch (error) {
     return {
