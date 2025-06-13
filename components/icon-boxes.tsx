@@ -12,7 +12,7 @@ const IconBoxes = () => {
               Free Shipping Instant delivery
             </div>
             <div className="text-sm text-muted-foreground">
-              Free shipping on orders above $10
+              Free shipping
             </div>
           </div>
           <div className="space-y-2">
